@@ -14,6 +14,7 @@ const loadDb = async () => {
     const raw = await fs.readFile(DB_PATH, 'utf8');
     return JSON.parse(raw);
   } catch (error) {
+    console.log('Initializing new database...');
     return { users: [], assignments: [], submissions: [] };
   }
 };
@@ -30,6 +31,9 @@ const getNextId = (items) => {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Ensure database exists
+fs.mkdir(path.dirname(DB_PATH), { recursive: true }).catch(console.error);
 
 app.get('/api/status', (_req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
@@ -122,5 +126,11 @@ app.put('/api/submissions/:id/grade', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Backend listening on http://localhost:${PORT}`);
+  console.log(`Backend listening on port ${PORT}`);
+  console.log(`Database path: ${DB_PATH}`);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
 });

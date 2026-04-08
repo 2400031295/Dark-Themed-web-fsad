@@ -6,6 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "start": "node server/index.js",
     "start:backend": "node server/index.js"
   },
   "dependencies": {
