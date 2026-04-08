@@ -3,7 +3,7 @@ services:
     name: assignment-hub-backend
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: echo "No build needed for backend"
     startCommand: node server/index-simple.js
     healthCheckPath: /api/status
     envVars:
