@@ -3,9 +3,11 @@ services:
     name: assignment-hub-backend
     env: node
     plan: free
-    buildCommand: echo "No build needed for backend"
+    buildCommand: npm install && npm install -g serve || true
     startCommand: node server/index-simple.js
     healthCheckPath: /api/status
+    healthCheckTimeout: 30
+    numInstances: 1
     envVars:
       - key: NODE_ENV
         value: production

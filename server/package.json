@@ -2,10 +2,11 @@
   "name": "assignment-hub-backend",
   "version": "1.0.0",
   "description": "Backend API for Assignment Hub",
-  "main": "server/index-simple.js",
+  "main": "index-simple.js",
   "type": "module",
   "scripts": {
-    "start": "node server/index-simple.js"
+    "start": "node index-simple.js",
+    "dev": "node index-simple.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
