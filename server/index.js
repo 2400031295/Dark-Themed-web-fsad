@@ -1,20 +1,40 @@
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DB_PATH = path.join(__dirname, 'db.json');
-const PORT = process.env.PORT || 4000;
+const PORT = parseInt(process.env.PORT, 10) || 4000;
+
+// Initialize database if it doesn't exist
+const initDb = async () => {
+  try {
+    if (!fsSync.existsSync(DB_PATH)) {
+      console.log('Creating new database file...');
+      const initialData = {
+        users: [],
+        assignments: [],
+        submissions: []
+      };
+      await fs.writeFile(DB_PATH, JSON.stringify(initialData, null, 2), 'utf8');
+      console.log('Database initialized at:', DB_PATH);
+    }
+  } catch (error) {
+    console.error('Failed to initialize database:', error.message);
+    throw error;
+  }
+};
 
 const loadDb = async () => {
   try {
     const raw = await fs.readFile(DB_PATH, 'utf8');
     return JSON.parse(raw);
   } catch (error) {
-    console.log('Initializing new database...');
+    console.error('Error loading database:', error.message);
     return { users: [], assignments: [], submissions: [] };
   }
 };
@@ -125,12 +145,23 @@ app.put('/api/submissions/:id/grade', async (req, res) => {
   res.json(submission);
 });
 
-app.listen(PORT, () => {
-  console.log(`Backend listening on port ${PORT}`);
-  console.log(`Database path: ${DB_PATH}`);
+app.listen(PORT, async () => {
+  try {
+    await initDb();
+    console.log(`✓ Backend listening on port ${PORT}`);
+    console.log(`✓ Database: ${DB_PATH}`);
+  } catch (error) {
+    console.error('✗ Failed to start server:', error.message);
+    process.exit(1);
+  }
 });
 
 process.on('uncaughtException', (err) => {
-  console.error('Uncaught Exception:', err);
+  console.error('✗ Uncaught Exception:', err.message);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('✗ Unhandled Rejection:', reason);
   process.exit(1);
 });
