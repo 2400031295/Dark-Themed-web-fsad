@@ -59,6 +59,20 @@ const getNextId = (items) => {
 app.use(cors());
 app.use(express.json());
 
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Assignment Hub Backend API',
+    version: '1.0.0',
+    endpoints: [
+      '/api/status',
+      '/api/assignments',
+      '/api/submissions',
+      '/api/users'
+    ]
+  });
+});
+
 app.get('/api/status', (req, res) => {
   res.json({ status: 'ok', message: 'Backend is running' });
 });
@@ -123,6 +137,17 @@ app.put('/api/submissions/:id/grade', (req, res) => {
   submission.status = req.body.status || submission.status;
 
   res.json(submission);
+});
+
+// User endpoints
+app.get('/api/users', (req, res) => {
+  res.json(db.users);
+});
+
+app.get('/api/users/:id', (req, res) => {
+  const user = db.users.find(u => u.id === parseInt(req.params.id, 10));
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  res.json(user);
 });
 
 app.listen(PORT, () => {
